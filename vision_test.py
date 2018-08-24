@@ -1,14 +1,11 @@
 import requests
 import time
 import sys
-import json
-from server import use_translate_api
-with open('../metadata/config.json', 'r') as f:
-    config = json.loads(f.read())
+
 api_url = "https://eastasia.api.cognitive.microsoft.com/vision/v1.0/describe"
 headers = {
     'Content-Type': 'application/octet-stream',
-    'Ocp-Apim-Subscription-Key': config['vision_key'],
+    'Ocp-Apim-Subscription-Key': '7fe8083f86814c12ba7d15500d7a95df',
 }
 params = {'maxCandidates': '1'}
 with open('static/temp/upload_180613_054312.jpg', 'rb') as f:
@@ -21,8 +18,7 @@ try:
     print(e)
     # print('{:02d}:{:02d}:{:02d}'.format(e // 3600, (e % 3600 // 60), e % 60), file=sys.stderr)
     resp.raise_for_status()
-    res = json.loads(resp.text)
-    print(use_translate_api(res['description']['captions'][0]['text']))
+    print(resp.text)
 except Exception as e:
     print(str(e))
     sys.exit(0)

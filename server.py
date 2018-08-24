@@ -7,8 +7,8 @@ from urllib.parse import urlencode
 import json
 from flask_cors import CORS
 
-with open('../metadata/config.json', 'r') as f:
-    config = json.loads(f.read())
+sys.path.append('../metadata')
+import vision_tuesday_config as config
 
 app = Flask(__name__)
 CORS(app)
@@ -49,7 +49,7 @@ def use_vision_api(image):
     api_url = "https://eastasia.api.cognitive.microsoft.com/vision/v1.0/describe"
     headers = {
         'Content-Type': 'application/octet-stream',
-        'Ocp-Apim-Subscription-Key': config['vision_key'],
+        'Ocp-Apim-Subscription-Key': config.VISION_API_CONFIG['app_key'],
     }
     params = {'maxCandidates': '1'}
     data = image
@@ -68,26 +68,23 @@ def translate_text(image_data):
     return result
 
 def use_translate_api(text):
-    api_url = "https://api.cognitive.microsofttranslator.com/translate"
-    querystring = {"api-version":"3.0",
-        'from' : 'en',
-    	'to' : 'ko'
+    api_url = "https://openapi.naver.com/v1/papago/n2mt"
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'X-Naver-Client-Id': config.PAPAGO_API_CONFIG['id'],
+        'X-Naver-Client-Secret': config.PAPAGO_API_CONFIG['secret']
     }
-    headers= {
-        'Ocp-Apim-Subscription-Key' : config['translate_key'],
-        'Content-Type': "application/json",
+    data= {
+        'source':'en',
+        'target':'ko',
+        'text':text
     }
-    content = [{"Text": text}]
-    response_body = json.dumps(content)
-    try:
-        start_time = time.time()
-        response = requests.request("POST", api_url, data=response_body, headers=headers, params=querystring)
-        e = time.time() - start_time
-        print(e)
-        response.raise_for_status()
+    data = urlencode(data)
 
-        res = json.loads(response.text)
-        return res[0]['translations'][0]['text']
+    try:
+        resp = requests.post(api_url, headers=headers, data=data)
+        resp.raise_for_status()
+        return json.loads(resp.text)['message']['result']['translatedText']
     except Exception as e:
         print(str(e))
         return '번역 에러'

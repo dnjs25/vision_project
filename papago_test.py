@@ -2,15 +2,12 @@ import requests
 from urllib.parse import urlencode
 import time
 import sys
-import json
 
-with open('../metadata/config.json', 'r') as f:
-    config = json.loads(f.read())
 api_url = "https://openapi.naver.com/v1/papago/n2mt"
 headers = {
     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-    'X-Naver-Client-Id': config['papago_id'],
-    'X-Naver-Client-Secret': config['papago_secret']
+    'X-Naver-Client-Id': 'OLTtxIOUTfarMcIVgBIq',
+    'X-Naver-Client-Secret': 'hckKS57D2M'
 }
 data= {
     'source':'en',
